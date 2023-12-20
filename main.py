@@ -125,38 +125,40 @@ naming_dict = {
     "TMW": "ICE - TMX WCS 1A (TMW)"
 }
 
-
-if check_emails_received(subjects):
+def run():
+    if check_emails_received(subjects):
+        save_attachments(subjects)
+        for subject in subjects:
+            merge_col1 = 'DeliveryPeriod'
+            merge_col2 = 'PriceCurveName'
+            if subject == "ICE Data: Cleared Canadian Oil Settlement":
+                name = "AESO 7x24-FWD"
+                filter_to = ['XCU']
+                import_file = 'ngxcleared_power_'
+            elif subject == "ICE Data: Cleared Oil Settlement":
+                name = "ICE_CRUDE"
+                filter_to = ['ARV', 'NGE', 'NGL']
+                import_file = 'icecleared_oil_'
+            elif subject == "ICE Data: Cleared Gas Settlement":
+                name = "ICE_GAS"
+                filter_to = ['BM2']
+                import_file = 'icecleared_gas_'
+            elif subject == "ICE Data: NGX Power Settlement":
+                name = "ICE_SWAPS"
+                filter_to = ['IBC',"ISO", "NBI", "NBR", "PRC", "PRL", "PRN"]
+                import_file = 'icecleared_ngl_'
+            elif subject == "ICE Data: NGX Gas Settlement":
+                name = "NGX 5A-7A FWD"
+                filter_to = ['XW7', "XUN", "XW6", "XNR"]
+                import_file = 'ngxcleared_gas_'
+            elif subject == "ICE Data: Cleared NGL Settlement":
+                name = "ICE_DIFF"
+                filter_to = ["CSH", "TMF", "TMR", "TMS", "TMU","TMW"]
+                import_file = 'iceclearedoil_ca_'
+            template = merge_data(import_file, name, filter_to, merge_col1, merge_col2, naming_dict)
+            export_to_excel(template, name)
+    else:
+        print("Not all required emails have been received.")
     
-    save_attachments(subjects)
-    for subject in subjects:
-        merge_col1 = 'DeliveryPeriod'
-        merge_col2 = 'PriceCurveName'
-        if subject == "ICE Data: Cleared Canadian Oil Settlement":
-            name = "AESO 7x24-FWD"
-            filter_to = ['XCU']
-            import_file = 'ngxcleared_power_'
-        elif subject == "ICE Data: Cleared Oil Settlement":
-            name = "ICE_CRUDE"
-            filter_to = ['ARV', 'NGE', 'NGL']
-            import_file = 'icecleared_oil_'
-        elif subject == "ICE Data: Cleared Gas Settlement":
-            name = "ICE_GAS"
-            filter_to = ['BM2']
-            import_file = 'icecleared_gas_'
-        elif subject == "ICE Data: NGX Power Settlement":
-            name = "ICE_SWAPS"
-            filter_to = ['IBC',"ISO", "NBI", "NBR", "PRC", "PRL", "PRN"]
-            import_file = 'icecleared_ngl_'
-        elif subject == "ICE Data: NGX Gas Settlement":
-            name = "NGX 5A-7A FWD"
-            filter_to = ['XW7', "XUN", "XW6", "XNR"]
-            import_file = 'ngxcleared_gas_'
-        elif subject == "ICE Data: Cleared NGL Settlement":
-            name = "ICE_DIFF"
-            filter_to = ["CSH", "TMF", "TMR", "TMS", "TMU","TMW"]
-            import_file = 'iceclearedoil_ca_'
-        template = merge_data(import_file, name, filter_to, merge_col1, merge_col2, naming_dict)
-        export_to_excel(template, name)
-else:
-    print("Not all required emails have been received.")
+if __name__ == "__main__":
+    run()
